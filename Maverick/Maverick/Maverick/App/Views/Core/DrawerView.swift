@@ -70,7 +70,14 @@ class DrawerView: BaseView {
     self.mouseSwiped = true
     if let touch = touches.first {
       let currentPoint = touch.locationInView(self)
-      points.append(currentPoint)
+      if let nearestPoint = self.points.last {
+        let deltaX = nearestPoint.x - currentPoint.x
+        let deltaY = nearestPoint.y - currentPoint.y
+        let delta = deltaX*deltaX + deltaY*deltaY
+        if delta > 20 {
+          points.append(currentPoint)
+        }
+      }
       UIGraphicsBeginImageContext(self.frame.size)
       self.drawImage.image?.drawInRect(CGRectMake(0, 0, self.frame.size.width, self.frame.size.height))
       CGContextMoveToPoint(UIGraphicsGetCurrentContext(), lastPoint.x, lastPoint.y)
@@ -124,13 +131,16 @@ class DrawerView: BaseView {
   
   func pickPoints(point :[CGPoint]) {
     if points.count < self.numOfPoint {
+      self.label.text = "Redraw :("
       return
     }
     var pointPick = [CGPoint]()
-    let delta = points.count / self.numOfPoint
+    let delta = CGFloat(points.count) / CGFloat(self.numOfPoint)
     for index in 0...(self.numOfPoint - 1) {
-      pointPick.append(points[index*delta])
+      pointPick.append(points[Int(CGFloat(index)*delta)])
     }
+    //self.drawPoint(pointPick)
+    
     let input = InputData(p: pointPick, o: self.mode)
     if self.mode - 0.0 < 0.1 {
       self.label.text = "\(Int(Global.neuralNetworl.summation(input)/0.1))"
@@ -138,6 +148,15 @@ class DrawerView: BaseView {
       NSLog("Training...")
       Global.neuralNetworl.inputs.append(input)
       Global.neuralNetworl.trainingNeurals()
+    }
+  }
+  
+  func drawPoint(points: [CGPoint]) {
+    for p in points {
+      let view = UIView(frame: CGRectMake(0, 0, 5, 5))
+      view.center = p
+      view.backgroundColor = UIColor.greenColor()
+      self.addSubview(view)
     }
   }
 }
