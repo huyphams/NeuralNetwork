@@ -7,8 +7,8 @@
 //
 
 class DrawerView: BaseView {
-  private let drawViewImage = UIImageView()
-  private let imageViewImage = UIImageView()
+  private let drawImage = UIImageView()
+  private let bachgroudImage = UIImageView()
   private var mouseSwiped = false
   private var lastPoint = CGPointZero
   private var points = [CGPoint]()
@@ -25,10 +25,10 @@ class DrawerView: BaseView {
   
   override func initView() {
     super.initView()
-    self.drawViewImage.frame = Constant.mainBounds
-    self.imageViewImage.frame = Constant.mainBounds
-    self.addSubview(self.imageViewImage)
-    self.addSubview(self.drawViewImage)
+    self.drawImage.frame = Constant.mainBounds
+    self.bachgroudImage.frame = Constant.mainBounds
+    self.addSubview(self.bachgroudImage)
+    self.addSubview(self.drawImage)
     
     let buttonWidth = (Constant.mainBounds.width - 20) / 10
     for i in 1...10 {
@@ -53,7 +53,7 @@ class DrawerView: BaseView {
     self.play.titleLabel?.textColor = UIColor.whiteColor()
     self.play.backgroundColor = UIColor.purpleColor()
     self.play.addTarget(self, action: #selector(DrawerView.setMode(_:)), forControlEvents: UIControlEvents.TouchUpInside)
-
+    
     self.addSubview(self.label)
     self.addSubview(self.play)
   }
@@ -72,7 +72,7 @@ class DrawerView: BaseView {
       let currentPoint = touch.locationInView(self)
       points.append(currentPoint)
       UIGraphicsBeginImageContext(self.frame.size)
-      self.drawViewImage.image?.drawInRect(CGRectMake(0, 0, self.frame.size.width, self.frame.size.height))
+      self.drawImage.image?.drawInRect(CGRectMake(0, 0, self.frame.size.width, self.frame.size.height))
       CGContextMoveToPoint(UIGraphicsGetCurrentContext(), lastPoint.x, lastPoint.y)
       CGContextAddLineToPoint(UIGraphicsGetCurrentContext(), currentPoint.x, currentPoint.y)
       CGContextSetLineCap(UIGraphicsGetCurrentContext(), .Round)
@@ -80,7 +80,7 @@ class DrawerView: BaseView {
       CGContextSetRGBStrokeColor(UIGraphicsGetCurrentContext(), 0.5, 0.5, 0.5, 1.0)
       CGContextSetBlendMode(UIGraphicsGetCurrentContext(),.Normal)
       CGContextStrokePath(UIGraphicsGetCurrentContext())
-      self.drawViewImage.image = UIGraphicsGetImageFromCurrentImageContext()
+      self.drawImage.image = UIGraphicsGetImageFromCurrentImageContext()
       UIGraphicsEndImageContext();
       lastPoint = currentPoint;
     }
@@ -91,7 +91,7 @@ class DrawerView: BaseView {
     points.removeAll()
     if !self.mouseSwiped {
       UIGraphicsBeginImageContext(self.frame.size)
-      self.drawViewImage.image?.drawInRect(CGRectMake(0, 0, self.frame.size.width, self.frame.size.height))
+      self.drawImage.image?.drawInRect(CGRectMake(0, 0, self.frame.size.width, self.frame.size.height))
       CGContextSetLineCap(UIGraphicsGetCurrentContext(), .Round)
       CGContextSetLineWidth(UIGraphicsGetCurrentContext(), 3.0)
       CGContextSetRGBStrokeColor(UIGraphicsGetCurrentContext(), 0.5, 0.5, 0.5, 1)
@@ -99,16 +99,22 @@ class DrawerView: BaseView {
       CGContextAddLineToPoint(UIGraphicsGetCurrentContext(), lastPoint.x, lastPoint.y)
       CGContextStrokePath(UIGraphicsGetCurrentContext())
       CGContextFlush(UIGraphicsGetCurrentContext())
-      self.drawViewImage.image = UIGraphicsGetImageFromCurrentImageContext()
+      self.drawImage.image = UIGraphicsGetImageFromCurrentImageContext()
       UIGraphicsEndImageContext()
     }
     
     UIGraphicsBeginImageContext(self.frame.size)
-    self.imageViewImage.image?.drawInRect(CGRectMake(0, 0, self.frame.size.width, self.frame.size.height), blendMode: .Normal, alpha: 1.0)
-    self.drawViewImage.image?.drawInRect(CGRectMake(0, 0, self.frame.size.width, self.frame.size.height), blendMode: .Normal, alpha: 1.0)
-    self.imageViewImage.image = UIGraphicsGetImageFromCurrentImageContext()
-    self.drawViewImage.image = nil
+    self.bachgroudImage.image?.drawInRect(CGRectMake(0, 0, self.frame.size.width, self.frame.size.height), blendMode: .Normal, alpha: 1.0)
+    self.drawImage.image?.drawInRect(CGRectMake(0, 0, self.frame.size.width, self.frame.size.height), blendMode: .Normal, alpha: 1.0)
+    self.bachgroudImage.image = UIGraphicsGetImageFromCurrentImageContext()
+    self.drawImage.image = nil
     UIGraphicsEndImageContext()
+    UIView.animateWithDuration(2, animations: {
+      self.bachgroudImage.alpha = 0.0
+    }) { (finished) in
+      self.bachgroudImage.image = nil
+      self.bachgroudImage.alpha = 1.0
+    }
   }
   
   func setMode(button: UIButton) {
@@ -125,13 +131,11 @@ class DrawerView: BaseView {
     for index in 0...(self.numOfPoint - 1) {
       pointPick.append(points[index*delta])
     }
-    NSLog("Training...")
     let input = InputData(p: pointPick, o: self.mode)
-    
     if self.mode - 0.0 < 0.1 {
-      NSLog("Play :)")
-      NSLog("\(Global.neuralNetworl.summation(input))")
+      self.label.text = "\(Int(Global.neuralNetworl.summation(input)/0.1))"
     } else {
+      NSLog("Training...")
       Global.neuralNetworl.inputs.append(input)
       Global.neuralNetworl.trainingNeurals()
     }

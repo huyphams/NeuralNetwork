@@ -66,29 +66,36 @@ class NeuralNetwork: NSObject {
   }
   
   func trainingNeurals() {
-    while self.currentInput < self.inputs.count  {
-      let input = self.inputs[self.currentInput]
-      // Remove all input value
-      for neural in self.neurals {
-        neural.vSet.removeAll()
-      }
-      // Pass value for the first layer
-      for neural in self.neurals {
-        if neural.layer == 0 {
+    var complete = false
+    while !complete {
+      complete = true
+      self.currentInput = 0
+      while self.currentInput < self.inputs.count {
+        let input = self.inputs[self.currentInput]
+        // Remove all input value
+        for neural in self.neurals {
           neural.vSet.removeAll()
-          let point = input.points[neural.id]
-          neural.vSet.append(Float64(point.x))
-          neural.vSet.append(Float64(point.y))
         }
-        neural.summation()
-      }
-      if let neural = self.neurals.last {
-        let delta = input.out - neural.sum
-        if  fabs(delta) > 0.01 {
-          NSLog("============>Output: \(neural.sum) - delta: \(fabs(delta))")
-          self.reconfigNeural(input.out)
-        } else {
-          self.currentInput += 1
+        // Pass value for the first layer
+        for neural in self.neurals {
+          if neural.layer == 0 {
+            neural.vSet.removeAll()
+            let point = input.points[neural.id]
+            neural.vSet.append(Float64(point.x))
+            neural.vSet.append(Float64(point.y))
+          }
+          neural.summation()
+        }
+        if let neural = self.neurals.last {
+          let delta = input.out - neural.sum
+          if  fabs(delta) > 0.01 {
+            complete = false
+            NSLog("config weight: \(fabs(delta))")
+            self.reconfigNeural(input.out)
+          } else {
+            NSLog("Next input...")
+            self.currentInput += 1
+          }
         }
       }
     }
