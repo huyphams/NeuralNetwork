@@ -12,19 +12,21 @@ Nothing
 ## Contributors
 --------------------
 
-* [Huy Pham][huypham] Slave.
+* [Huy Pham](http://huypham.me) Slave.
 
 ## Tech
 --------------------
 
 Maverick uses a number of open source projects to work properly:
-Làm biếng quá chưa điền =.="
+
+- Làm biếng quá chưa điền =.="
 
 ## Installation
 --------------------
 
 ```sh
 ### install rbenv
+brew install rbenv
 
 ### install ruby.
 rbenv install <ruby version>
