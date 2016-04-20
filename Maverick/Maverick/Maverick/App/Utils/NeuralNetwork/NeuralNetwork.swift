@@ -18,7 +18,7 @@ class NeuralNetwork: NSObject {
       let neural = Neural()
       neural.id = index
       neural.layer = 0
-      neural.input = 20
+      neural.input = 2
       self.neurals.append(neural)
     }
     
@@ -65,65 +65,59 @@ class NeuralNetwork: NSObject {
     }
   }
   
-  func training() {
-    let input = self.inputs[self.currentInput]
-    self.trainingNeurals(input)
-  }
-  
-  private func trainingNeurals(input: InputData) {
-    // Remove all input value
-    for neural in self.neurals {
-      neural.vSet.removeAll()
-    }
-    
-    // Pass value for the first layer
-    for neural in self.neurals {
-      if neural.layer == 0 {
+  func trainingNeurals() {
+    while self.currentInput < self.inputs.count  {
+      let input = self.inputs[self.currentInput]
+      // Remove all input value
+      for neural in self.neurals {
         neural.vSet.removeAll()
-        for point in input.points {
+      }
+      // Pass value for the first layer
+      for neural in self.neurals {
+        if neural.layer == 0 {
+          neural.vSet.removeAll()
+          let point = input.points[neural.id]
           neural.vSet.append(Float64(point.x))
           neural.vSet.append(Float64(point.y))
         }
+        neural.summation()
+      }
+      if let neural = self.neurals.last {
+        let delta = input.out - neural.sum
+        if  fabs(delta) > 0.01 {
+          NSLog("============>Output: \(neural.sum) - delta: \(fabs(delta))")
+          self.reconfigNeural(input.out)
+        } else {
+          self.currentInput += 1
+        }
+      }
+    }
+    NSLog("Training complete")
+  }
+  
+  func summation(input: InputData) -> Float64 {
+    for neural in self.neurals {
+      neural.vSet.removeAll()
+    }
+    for neural in self.neurals {
+      if neural.layer == 0 {
+        neural.vSet.removeAll()
+        let point = input.points[neural.id]
+        neural.vSet.append(Float64(point.x))
+        neural.vSet.append(Float64(point.y))
       }
       neural.summation()
-      
-      
-      // Debug only
-      NSLog("\(neural.sum)")
-      if neural.id == 1 {
-   //    NSLog("herrerere")
-      }
     }
-    
     if let neural = self.neurals.last {
-      let delta = input.out - neural.sum
-      if  fabs(delta) > 0.01 {
-        // Learning... put some code ui here bro
-        NSLog("Learning...")
-        self.reconfigNeural(delta)
-        self.trainingNeurals(input)
-      } else {
-        NSLog("Passed next input...")
-        self.passNextInput()
-      }
+      return neural.sum
     }
+    return 0.0
   }
   
-  private func reconfigNeural(delta: Float64) {
+  private func reconfigNeural(desired: Float64) {
     for neural in self.neurals {
-      neural.reconfig(delta)
+      neural.reconfig(desired)
     }
-  }
-  
-  private func passNextInput() {
-    self.currentInput += 1
-    if self.currentInput >= self.inputs.count - 1 {
-      NSLog("Finished")
-      self.currentInput = 0
-      return
-    }
-    let input = self.inputs[self.currentInput]
-    self.trainingNeurals(input)
   }
 }
 

@@ -18,7 +18,7 @@ class Neural: NSObject {
   var links = [Neural]()
   var sum: Float64 = 0.0
   
-  private let lerningRate: Float64 = 0.01
+  private let lerningRate: Float64 = 0.005
   private var wSet = [Float64]()
   
   private func initW() {
@@ -49,13 +49,15 @@ class Neural: NSObject {
     self.transferValue()
   }
   
-  func reconfig(delta: Float64) {
+  func reconfig(desired: Float64) {
     let currentW = self.wSet
     self.wSet.removeAll()
     for index in 0...(currentW.count-1) {
       let w = currentW[index]
       let v = self.vSet[index]
-      self.wSet.append(w + delta*self.lerningRate*v)
+      let delta = desired - self.sum
+      let newW = w + delta*self.lerningRate*v
+      self.wSet.append(newW)
     }
   }
 }
