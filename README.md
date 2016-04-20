@@ -25,12 +25,18 @@ Maverick uses a number of open source projects to work properly:
 --------------------
 
 ```sh
+### install home brew
+/usr/bin/ruby -e "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install)"
+
 ### install rbenv
 brew install rbenv
 
+### install ruby-build
+git clone https://github.com/rbenv/ruby-build.git ~/.rbenv/plugins/ruby-build
+
 ### install ruby.
-rbenv install <ruby version>
-rbenv global <ruby version>
+rbenv install 2.3.0
+rbenv global 2.3.0
 
 ### install and setup cocoapods
 gem install cocoapods
