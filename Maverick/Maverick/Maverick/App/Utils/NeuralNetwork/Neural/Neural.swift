@@ -18,13 +18,13 @@ class Neural: NSObject {
   var links = [Neural]()
   var sum: Float64 = 0.0
   
-  private let lerningRate: Float64 = 0.005
+  private let lerningRate: Float64 = 0.02
   private var wSet = [Float64]()
   
   private func initW() {
     self.wSet.removeAll()
     for _ in 1...self.input {
-      self.wSet.append(0.1)
+      self.wSet.append(0.01*Float64(self.id) + 0.01*Float64(self.wSet.count))
     }
   }
   

@@ -90,10 +90,8 @@ class NeuralNetwork: NSObject {
           let delta = input.out - neural.sum
           if  fabs(delta) > 0.04 {
             complete = false
-            NSLog("config weight: \(fabs(delta))")
             self.reconfigNeural(input.out)
           } else {
-            NSLog("Next input...")
             self.currentInput += 1
           }
         }
