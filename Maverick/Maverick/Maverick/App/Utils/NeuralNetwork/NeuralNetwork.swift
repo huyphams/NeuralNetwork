@@ -72,10 +72,12 @@ class NeuralNetwork: NSObject {
       self.currentInput = 0
       while self.currentInput < self.inputs.count {
         let input = self.inputs[self.currentInput]
+
         // Remove all input value
         for neural in self.neurals {
           neural.vSet.removeAll()
         }
+        
         // Pass value for the first layer
         for neural in self.neurals {
           if neural.layer == 0 {
@@ -86,6 +88,7 @@ class NeuralNetwork: NSObject {
           }
           neural.summation()
         }
+        
         if let neural = self.neurals.last {
           let delta = input.out - neural.sum
           if  fabs(delta) > 0.04 {

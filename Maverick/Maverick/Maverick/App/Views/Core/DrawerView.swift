@@ -136,13 +136,28 @@ class DrawerView: BaseView {
     }
     var pointPick = [CGPoint]()
     let delta = CGFloat(points.count) / CGFloat(self.numOfPoint)
+
+    var minX = Constant.mainBounds.width
+    var minY = Constant.mainBounds.height
     for index in 0...(self.numOfPoint - 1) {
-      pointPick.append(points[Int(CGFloat(index)*delta)])
+      let point = points[Int(CGFloat(index)*delta)]
+      if point.x < minX {
+        minX = point.x
+      }
+      if point.y < minY {
+        minY = point.y
+      }
+      pointPick.append(point)
     }
-    //self.drawPoint(pointPick)
     
-    let input = InputData(p: pointPick, o: self.mode)
-    if self.mode - 0.0 < 0.1 {
+    var normalizePoint = [CGPoint]()
+    for p in pointPick {
+      let point = CGPoint(x: p.x - minX, y: p.y - minY)
+      normalizePoint.append(point)
+    }
+    
+    let input = InputData(p: normalizePoint, o: self.mode)
+    if self.mode < 0.1 {
       self.label.text = "\(Int(Global.neuralNetworl.summation(input)/0.1))"
     } else {
       NSLog("Training...")
