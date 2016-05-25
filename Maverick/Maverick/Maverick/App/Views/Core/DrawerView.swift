@@ -155,7 +155,6 @@ class DrawerView: BaseView {
       let point = CGPoint(x: p.x - minX, y: p.y - minY)
       normalizePoint.append(point)
     }
-    
     let input = InputData(p: normalizePoint, o: self.mode)
     if self.mode < 0.1 {
       self.label.text = "\(Int(Global.neuralNetworl.summation(input)/0.1))"

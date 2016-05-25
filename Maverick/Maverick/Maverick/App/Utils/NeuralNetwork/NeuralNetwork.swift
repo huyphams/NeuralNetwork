@@ -66,37 +66,33 @@ class NeuralNetwork: NSObject {
   }
   
   func trainingNeurals() {
-    var complete = false
-    while !complete {
-      complete = true
-      self.currentInput = 0
-      while self.currentInput < self.inputs.count {
-        let input = self.inputs[self.currentInput]
-
-        // Remove all input value
-        for neural in self.neurals {
-          neural.vSet.removeAll()
+    self.currentInput = 0
+    while self.currentInput < self.inputs.count {
+      let input = self.inputs[self.currentInput]
+      
+      // Remove all input value
+      for neural in self.neurals {
+        neural.vSet.removeAll()
+      }
+      
+      // Pass value for the first layer
+      for neural in self.neurals {
+        if neural.layer == 0 {
+          let point = input.points[neural.id]
+          neural.vSet.append(Float64(point.x))
+          neural.vSet.append(Float64(point.y))
         }
-        
-        // Pass value for the first layer
-        for neural in self.neurals {
-          if neural.layer == 0 {
-            neural.vSet.removeAll()
-            let point = input.points[neural.id]
-            neural.vSet.append(Float64(point.x))
-            neural.vSet.append(Float64(point.y))
-          }
-          neural.summation()
-        }
-        
-        if let neural = self.neurals.last {
-          let delta = input.out - neural.sum
-          if  fabs(delta) > 0.04 {
-            complete = false
-            self.reconfigNeural(input.out)
-          } else {
-            self.currentInput += 1
-          }
+        // Calculate 
+        neural.summation()
+      }
+      
+      if let neural = self.neurals.last {
+        let delta = input.out - neural.sum
+        if fabs(delta) > 0.04 {
+          self.currentInput = 0
+          self.reconfigNeural(input.out)
+        } else {
+          self.currentInput += 1
         }
       }
     }
